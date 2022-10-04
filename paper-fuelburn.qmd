@@ -1,0 +1,86 @@
+---
+title: "Towards Characterising Taxi Operations for Fuel Burn Estimation"
+subtitle: "WORK IN PROGRESS - COME BACK AND CHECK FOR LATEST DRAFT"
+author: "PRU"
+format:
+  pdf:
+    documentclass: scrartcl
+    classoption: [twocolumn]
+    #lof: true
+    #lot: true
+    papersize: a4
+    geometry:
+      - top=30mm
+      - left=20mm
+      - heightrounded
+    # fontfamily: libertinus
+    colorlinks: true
+  html: default
+abstract: |
+  <teaser>Assessing the climate impact of air transportation has gained higher visibility. Fuel burn estimation is important
+  <short background>
+  <approach chosen / research method>This paper applies a data-driven and empirical approach.
+  <experimental work>Analysed x airports
+  <results obtained> ... what did we find
+  <conclusions>This paper demonstrates the feasibility of applying open ADSB data to augment the fuel burn estimation during the taxi-phase. This work serves as an input to the further development of the gate-to-gate fuel burn estimation by the Performance Review Commission.
+bibliography: paper-fuelburn-xbib.bib
+editor: visual
+---
+
+## Introduction
+
+<!--  Nature of the problem. -------------------------------------------- -->\
+\
+<!--  Background of previous work. -------------------------------------- -->\
+\
+<!--  Purpose and significance of the paper. ---------------------------- -->\
+\
+<!--  Method by which the problem is approached. ------------------------ -->
+
+The contributions of this paper are as follows:
+
+* conceptualisation and refined definition of operational LTO cycle;
+* surface trajectory based description of taxi sub-phases; and 
+* initial use-case analysis of the proposed approach.
+
+## Background
+
+### ICAO LTO Cycle
+
+ICAO defines LTO Cycle [@icaoAnnex16Vol22017].
+
+\onecolumn
+
+```{r}
+#| echo: false
+#| fig-cap: ICAO engine emission certification LTO cycle
+#| fig-pos: "h"
+knitr::include_graphics("./figures/ICAO-standard-LTO-cycle.png")
+```
+
+\twocolumn
+
+Based on the LTO cycle, the fuel burn of an aircraft is determined by the specific sub-phase, i.e. mode, and its associated thrust setting. 
+The latter can then be expressed as an engine specific fuel-flow rate.
+In general, the total fuel burn $F_i$ of an aircraft with engine E for flight i is then the sum of the fuel burn per each sub-phase:
+$$F_i = \sum_p (f_{ip} * t_{ip}) $$
+a given taxi
+phase of a flight is calculated by multiplying the time
+spent at each phase by a fuel-flow rate of the engine type
+for the corresponding phase.
+
+## Materials, Methods
+
+## Results and Discussion
+
+## Conclusions
+\
+<!--  What is shown by this work and its significance. ------------------ -->\
+\
+<!-- Limitations and advantages. ---------------------------------------- -->\
+\
+<!-- Applications of the results. --------------------------------------- -->\
+\
+<!--  Recommendations for further work. --------------------------------- -->
+
+## References {-}
