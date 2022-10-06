@@ -2,6 +2,8 @@
 title: "Towards Characterising Taxi Operations for Fuel Burn Estimation"
 subtitle: "WORK IN PROGRESS - COME BACK AND CHECK FOR LATEST DRAFT"
 author: "PRU"
+date: today
+date-format: "D MMMM YYYY"
 format:
   pdf:
     documentclass: scrartcl
@@ -17,19 +19,49 @@ format:
     colorlinks: true
   html: default
 abstract: |
-  <teaser>Assessing the climate impact of air transportation has gained higher visibility. Fuel burn estimation is important
-  <short background>
-  <approach chosen / research method>This paper applies a data-driven and empirical approach.
-  <experimental work>Analysed x airports
-  <results obtained> ... what did we find
+  TODO: PRECISE ABSTRACT
+  <teaser>Assessing the climate impact of air transportation has gained higher visibility and is a political priority. Efforts are underway to accelerate the production and rollout of sustainable aviation fuel and the development of novel aircraft designs and propulsion techniques. Operational efficiency is a near-time measure.To assess the latter, fuel burn estimation is key ingredient.
+  <short background>To date there exists no global requirement to report fuel burn although flight data recording allows to provide accurate numbers for flight phase dependent fuel flow rates. To support environmental considerations during concept development or evaluation a combination of heuritics and aircraft performance models is used. For the fuel burn estimation during the taxi phase, the socalled landing-and-take-off-cycle is the predominant model.   
+  <approach chosen / research method>This paper applies a data-driven and empirical approach. ADD MORE ABOUT APPROACH
+  <experimental work>Analysed x airports DETAIL WORK
+  <results obtained> ... what did we find SUMMARISE KEY RESULTS
   <conclusions>This paper demonstrates the feasibility of applying open ADSB data to augment the fuel burn estimation during the taxi-phase. This work serves as an input to the further development of the gate-to-gate fuel burn estimation by the Performance Review Commission.
 bibliography: paper-fuelburn-xbib.bib
+csl: ieee-with-url.csl
+execute: 
+  echo: false
 editor: visual
 ---
 
 ## Introduction
 
-<!--  Nature of the problem. -------------------------------------------- -->\
+<!-- Nature of the problem. -------------------------------------------- -->
+
+Throughout the past years climate change has become a political priority.
+Within this context, the impact of air transportation on climate change is a subject of regular debate.
+The contribution of air transportation to the global CO~2~ emissions ranges around 2.8% (c.f. @fig-global-co2).
+However, in terms of total CO~2~ emissions, air transportation is continuously increasing.
+Despite the unprecedented traffic decline during COVID-19, air transportation is projected to continue to grow.
+
+At ICAO Assembly 40 in 2019 two global aspirational goals for curbing the impact of the international aviation sector were agreed.
+This includes an annual fuel efficiency improvement of 2% through 2050 and carbon neutral growth from 2020 onwards [@icao2019]. Across the globe, states have defined ambitious political goals to address the impact of climate change. For example, the European Union launched its Green Deal [@europeancommission2019] and Fit-for-55 initiative.
+The latter strives strives towards cutting the net greenhouse gas emissions by at least 55% by 2030, compared to 1990 levels [@EuropeanCommission2021Fitfor55EuropeanGreen].
+
+In general terms, air navigation shall contribute to the protection of the environment by considering noise, gaseous emissions and other environmental issues in the implementation and operation (KPA Environment, c.f. Appendix D [@icaodoc98542005]).
+Accordingly, there is a higher interest in monitoring/estimating the impact of operational (in)efficiency.
+Operational inefficiencies typically increase the aircraft flying time (i.e. airborne and surface movement times) and , thus, engine running time.
+Engine time is directly linked to fuel burn and associated emissions and pollutants.
+In that respect, inefficiencies contribute to the ditremental effect of excessive emissions to climate change.
+
+```{r}
+#| label: fig-global-co2
+#| fig-cap: "Global CO2 emssions"
+#| fig-pos: "h"
+#| out-width: 50%
+knitr::include_graphics("./figures/Global-CO2-emissions-from-aviation.png")
+```
+
+\
 \
 <!--  Background of previous work. -------------------------------------- -->\
 \
@@ -39,48 +71,140 @@ editor: visual
 
 The contributions of this paper are as follows:
 
-* conceptualisation and refined definition of operational LTO cycle;
-* surface trajectory based description of taxi sub-phases; and 
-* initial use-case analysis of the proposed approach.
+-   conceptualisation and refined definition of operational LTO cycle;
+-   surface trajectory based description of taxi sub-phases; and
+-   initial use-case analysis of the proposed approach.
 
 ## Background
 
+### Literature Review
+
+Fuel burn estimation during the taxi-phase is not a fundamental new problem.
+However, research has been limited.
+
+ADD REFS TO WORK BY
+
+-   Hamsa [@khadilkar2012taxifuelburn] , Kim & Baik [@KimBaik2020EmpiricalMethodEstimating]
+-   use of BADA for ground movements
+
 ### ICAO LTO Cycle
 
-ICAO defines LTO Cycle [@icaoAnnex16Vol22017].
-
-\onecolumn
+As part of the engine emission certification process ICAO defines the landing and take-off (LTO) cycle [@icaoAnnex16Vol22017] based on 4 distinct phases (i.e. modes): approach, idle/taxi, take-off, and climb-out.
+The LTO assumptions comprise specific thrust settings and durations (i.e. time-in-mode).
+@fig-ICAO-LTO shows the different phases and respective thrust setting and duration values.
 
 ```{r}
+#| label: fig-ICAO-LTO
 #| echo: false
-#| fig-cap: ICAO engine emission certification LTO cycle
+#| fig-cap: "ICAO engine certification LTO" 
 #| fig-pos: "h"
+#| out-width: 50%
 knitr::include_graphics("./figures/ICAO-standard-LTO-cycle.png")
 ```
 
-\twocolumn
-
-Based on the LTO cycle, the fuel burn of an aircraft is determined by the specific sub-phase, i.e. mode, and its associated thrust setting. 
+Based on the LTO cycle, the fuel burn of an aircraft is determined by the specific sub-phase, i.e. mode, and its associated thrust setting.
 The latter can then be expressed as an engine specific fuel-flow rate.
-In general, the total fuel burn $F_i$ of an aircraft with engine E for flight i is then the sum of the fuel burn per each sub-phase:
-$$F_i = \sum_p (f_{ip} * t_{ip}) $$
-a given taxi
-phase of a flight is calculated by multiplying the time
-spent at each phase by a fuel-flow rate of the engine type
-for the corresponding phase.
+In general, the total fuel burn $F_i$ of an aircraft with engine E for flight i is then the sum of the fuel burn per each sub-phase: $$F_i = \sum_p (f_{ip} * t_{ip}) $$ a given taxi phase of a flight is calculated by multiplying the time spent at each phase by a fuel-flow rate of the engine type for the corresponding phase.
 
 ## Materials, Methods
 
+### Conceptual Model
+
+The approach chosen for this paper builds on an extension of the LTO cycle.
+@fig-ICAO-LTO summarises the phases and time-in-mode assumptions for the LTO cycle.
+Fleuti et al. [-@fleuti2012air] introduced an operational LTO cycle (c.f. @fig-LTO-operational). Kim and Baik [-@KimBaik2020EmpiricalMethodEstimating] broke down the taxi portion into distinct stages.
+
+```{r}
+#| label: fig-LTO-operational
+#| echo: false
+#| fig-cap: Operational LTO Cycle
+#| fig-pos: "ht"
+#| out-width: 50%
+knitr::include_graphics("./figures/LTO-ZurichSimple.png")
+```
+
+We generalise previous work by describing the taxi-trajectory as a sequence of infrastructure and operations dependent phases.
+In particular, the phase identification is based on a data-analytical approach.
+
+EXPLORE FURTHER AND DEVELOP DIAGRAM
+
+### Data and Data Preparation
+
+-   IEED / BRA-EUR / previous research - airframe-engine mapping
+
+-   OSM - airport infrastructure, definition of movement area components
+
+-   OSN - aircraft position information
+
 ## Results and Discussion
 
+### Airport Infrastructure Categorisation
+
+To date no globally harmonised approach to the description and categorisation of airport infrastructure exists.
+FAA proposed a categorisation for the estimation of runway system capacities.
+This is based on groups of runway orientations within the United States [@FAA1983airportcapacity; @arcp79nap2012airfieldcapacity].
+Work in SESAR proposed a combination of layout and traffic characteristic for Europe (c.f. [@sesar2013airportDOD], section 3.1)
+
+WORK OUT FOR USE CASE AIRPORTS
+
+### Taxi-phase Identification
+
+TODO: PROVIDE RESULTS FOR CHOSEN USE-CASE
+
+### Comparison of Estimation
+
+TODO: CALCULATE LTO ESTIMATES VS REFINED APPROACH
+
 ## Conclusions
+
+The climate impact and footprint of air transportation will be a defining societal, political, and strategic priority for the years to come.
+Within this context, reliable and robust estimation of fuel burn and associated green-house gas emissions will be a key requirement.
+
+<!--  What is shown by this work and its significance. ------------------ -->
+
 \
-<!--  What is shown by this work and its significance. ------------------ -->\
+This paper conceptualised and refined the surface portion of the LTO cycle to reduce overestimation of fuel burn during taxi operations.
+The approach builds on open and high resolution air transport movement data.
+
+ADD SOME KEY RESULTS/FEATURES.
+
+<!-- Limitations and advantages. ---------------------------------------- -->
+
 \
-<!-- Limitations and advantages. ---------------------------------------- -->\
+The presented work has some limitations.
+The approach follows a pure data-analytical approach and relies on open surface trajectory data for a limited use-case sample of airports.
+This approach was chosen primarily due to the lack of actual fuel burn data.
+While the results allow to fine-tune the level of estimation to reflect operations at airports, there is a need to validate the results with respect to the IEED based fuel-flow indices.\
+This paper focussed on a use-case of XX airport(s).
+This subset was chosen based on the data availability, i.e. ground coverage of Opensky Network.
+The application of the proposed method is therefore dependent on the availability of open surface trajectory data.
+To date this coverage is limited.
+The Open Performance Data Initiative of the PRC in collaboration with Opensky Network will help to support the iterative application of the approach to European airports.\
+This paper addresses the taxi phase without consideration of weather phenomena, operational constraints (e.g. construction work, noise abatement), and operational procedures (e.g. single engine taxi operations, reduced thrust take-off, reverse thrust decelaration).
+
+The major benefit of the proposed method revolves around the utilisation of open data to compensate for the error margins and refine the LTO assumptions.
+This reduces the overestimation of fuel burn during the taxi phase of flight.
+The method is data-driven and, thus, can be readily automated for local use.
+Although it is noted that the best source for fuel burn is the aircraft (i.e. flight data recording, quality data), the approach does not require additional reporting requirements on airspace users.
+Given the political discussion, such a data reporting requirement is highly contentious.
+
+<!-- Applications of the results. --------------------------------------- -->
+
 \
-<!-- Applications of the results. --------------------------------------- -->\
-\
+
+SPEAK ABOUT NEAR_TERM APPLICAION OF RESULTS --\> refinement of initial gate-to-gate fuel burn estimation method.
+
 <!--  Recommendations for further work. --------------------------------- -->
 
-## References {-}
+The work presented in this paper is based on operational expertise and data-analytical concepts.
+The results will inform the on-going work of the PRC with respect to gate-to-gate fuel burn estimation for the European context.
+To fine-tune the conceptual modelling and approach, validation of the fuel burn estimation with interested air transport operators is planned for the near future.
+
+Potential future work
+
+-   ML for learning airport parameters (e.g. parking position, runway/entry/exit layout, nose-in/pushback parking positions)
+-   setup "global harmonised lookup table"
+
+Next to the application of the work within the European context, the results will also presented and applied within the global benchmarking community.
+
+## References {.unnumbered}
